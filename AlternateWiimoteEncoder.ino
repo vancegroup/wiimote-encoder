@@ -14,7 +14,7 @@ Nunchuk nunchuk;
 // initial values
 Nunchuk::DataReport report = Nunchuk::defaultReport;
 
-Watchdog checkVCC(1000);
+Watchdog shouldGetCalled(5000);
 
 
 inline int16_t getEncoderValue() {
@@ -22,37 +22,28 @@ inline int16_t getEncoderValue() {
 }
 
 AutoRanging<int, uint8_t> counterRange(0, 255);
-void sendChange(Nunchuk & n) {
-  uint8_t mapped = counterRange.process(getEncoderValue());
-  report.joystickAxes[0] = mapped;
-  n.sendChange(report);
+void sendChange() {
+  report.joystickAxes[0] = counterRange.process(getEncoderValue());
+  nunchuk.sendChange(report);
 }
 
 
 void handleRequest(Nunchuk & n) {
-  sendChange(n);
-  checkVCC.reset();
-  digitalWrite(LED_BUILTIN, HIGH);
+  //sendChange(n);
+  shouldGetCalled.reset();
 }
 
 
-enum {
-  WiimoteVCCPin = A0
-};
-
-bool connected = false;
-
 void doConnect() {
-
-  connected = true;
   nunchuk.begin(handleRequest);
-  digitalWrite(LED_BUILTIN, HIGH);
 }
 
 void setup() {
   // setup code goes here
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
+  
+  doConnect();
 
   //Initialize serial
   Serial.begin(115200);
@@ -62,44 +53,19 @@ void setup() {
   Serial.println(getEncoderValue());
   counterRange.setCenter(getEncoderValue());
 
-  doConnect();
 }
 
 Watchdog dumpMapStatus(5000);
 
-enum {
-  startThreshold = 500,
-  stopThreshold = 300
-};
-
-void doDisconnect() {
-  connected = false;  
-  digitalWrite(LED_BUILTIN, LOW);
-  Nunchuk::setDeviceDetectLow();
-}
-void checkWiimoteStatus() {
-  if (checkVCC.hasExpired()) {
-    int val = analogRead(WiimoteVCCPin);
-    if (connected && val < stopThreshold) {
-      Serial << "Looks like we got unplugged." << endl;
-      doDisconnect();
-    } 
-    else if (!connected && val > startThreshold) {
-      Serial << "Probably connected!" << endl;
-      doConnect();
-    }
-
-    checkVCC.reset();
-  }
-}
-
 void loop() {
   // code that should be repeated goes here  
   //checkWiimoteStatus();
-  if (connected) {
-    sendChange(nunchuk);
-  }
 
+  if (shouldGetCalled.hasExpired()) {
+   Serial << "Attempting to re-connect" << endl;
+   doConnect();
+   shouldGetCalled.reset();
+  }
 
 
   if (dumpMapStatus.hasExpired()) {
@@ -107,12 +73,14 @@ void loop() {
     counterRange.dumpStatus(Serial);
     dumpMapStatus.reset();
   }
-  //sendChange(nunchuk);
 
-  delay(500);
+  sendChange();
+
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(10);
   //Serial << "Counter value: " << _DEC(myCounter) << " Mapped: " << _DEC(mapped) << endl;
   //Serial.println(mapcounter, DEC);
-  Serial.println(getEncoderValue(), DEC);
+  //Serial.println(getEncoderValue(), DEC);
   //report.joystickAxes[0] = lowByte(counter);
 }
 
