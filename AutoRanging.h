@@ -12,6 +12,7 @@ public:
   }
 
   OutType process(InType inVal) {
+    lastInVal = inVal;
     if (inVal < minVal) {
       minVal = inVal;
       updateRange();
@@ -21,7 +22,8 @@ public:
       updateRange();
     }
     const InType clampedVal = inVal < bottomInput ? bottomInput : (inVal > topInput ? topInput : inVal);
-    return (clampedVal - bottomInput) * (outRange/static_cast<float>(inRange)) + lowVal;
+    lastValue = (clampedVal - bottomInput) * (outRange/static_cast<float>(inRange)) + lowVal;
+    return lastValue;
 
   }
   
