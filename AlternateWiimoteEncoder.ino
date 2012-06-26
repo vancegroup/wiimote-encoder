@@ -21,7 +21,7 @@ inline int16_t getEncoderValue() {
   return enc.read();
 }
 
-AutoRanging<int, uint8_t> counterRange(0, 255);
+AutoRanging<int, uint8_t> counterRange(0x7f, 0xff);
 void sendChange() {
   uint8_t val = counterRange.process(getEncoderValue());
   //report.joystickAxes[0] = val;
