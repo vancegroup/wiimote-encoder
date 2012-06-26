@@ -40,22 +40,29 @@ enum {
   WiimoteVCCPin = A0
 };
 
+bool connected = false;
+
+void doConnect() {
+
+  connected = true;
+  nunchuk.begin(handleRequest);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
 
 void setup() {
   // setup code goes here
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 
-  Nunchuk::setDeviceDetectLow();
-
-
   //Initialize serial
   Serial.begin(115200);
+
   // get first reading
   Serial.print("Encoder setup complete, counter currently at ");
   Serial.println(getEncoderValue());
   counterRange.setCenter(getEncoderValue());
-  checkVCC.reset();
+
+  doConnect();
 }
 
 Watchdog dumpMapStatus(5000);
@@ -65,22 +72,21 @@ enum {
   stopThreshold = 300
 };
 
-bool connected = false;
-
+void doDisconnect() {
+  connected = false;  
+  digitalWrite(LED_BUILTIN, LOW);
+  Nunchuk::setDeviceDetectLow();
+}
 void checkWiimoteStatus() {
   if (checkVCC.hasExpired()) {
     int val = analogRead(WiimoteVCCPin);
     if (connected && val < stopThreshold) {
       Serial << "Looks like we got unplugged." << endl;
-      connected = false;  
-      digitalWrite(LED_BUILTIN, LOW);
-      Nunchuk::setDeviceDetectLow();
+      doDisconnect();
     } 
     else if (!connected && val > startThreshold) {
       Serial << "Probably connected!" << endl;
-      connected = true;
-      nunchuk.begin(handleRequest);
-      digitalWrite(LED_BUILTIN, HIGH);
+      doConnect();
     }
 
     checkVCC.reset();
@@ -89,7 +95,7 @@ void checkWiimoteStatus() {
 
 void loop() {
   // code that should be repeated goes here  
-  checkWiimoteStatus();
+  //checkWiimoteStatus();
   if (connected) {
     sendChange(nunchuk);
   }
@@ -101,7 +107,7 @@ void loop() {
     counterRange.dumpStatus(Serial);
     dumpMapStatus.reset();
   }
-  sendChange(nunchuk);
+  //sendChange(nunchuk);
 
   delay(500);
   //Serial << "Counter value: " << _DEC(myCounter) << " Mapped: " << _DEC(mapped) << endl;
@@ -109,6 +115,7 @@ void loop() {
   Serial.println(getEncoderValue(), DEC);
   //report.joystickAxes[0] = lowByte(counter);
 }
+
 
 
 
