@@ -21,9 +21,25 @@ inline int16_t getEncoderValue() {
   return enc.read();
 }
 
+
+
+enum {
+   MaxEncoderValue = 4904,
+   MinEncoderValue = -4904
+};
+enum {
+   MinOutputValue = 0x7f,
+   MaxOutputValue = 0xff
+};
+
 AutoRanging<int, uint8_t> counterRange(0x7f, 0xff);
 void sendChange() {
-  uint8_t val = counterRange.process(getEncoderValue());
+  // Auto ranging:
+  //uint8_t val = counterRange.process(getEncoderValue());
+  
+  // Manually ranging:
+  uint8_t val = my_map<int16_t, uint8_t>( my_constrain<int16_t>(getEncoderValue(), MinEncoderValue, MaxEncoderValue), MinEncoderValue, MaxEncoderValue, MinOutputValue, MaxOutputValue );
+  
   //report.joystickAxes[0] = val;
   report.joystickAxes[1] = val;
   nunchuk.sendChange(report);

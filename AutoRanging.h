@@ -1,5 +1,19 @@
 //#include <Streaming.h>
 #include <Arduino.h>
+
+
+
+template<typename T>
+inline T my_constrain(const T x, const T low, const T high) {
+ return x < low ? low : (x > high ? high : x);
+}
+
+
+template<typename T1, typename T2>
+inline T2 my_map(const T1 x, const T1 in_min, const T1 in_max, const T2 out_min, const T2 out_max) {
+ return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 template<typename InType, typename OutType>
 class AutoRanging {
 public:
