@@ -23,7 +23,9 @@ inline int16_t getEncoderValue() {
 
 AutoRanging<int, uint8_t> counterRange(0, 255);
 void sendChange() {
-  report.joystickAxes[0] = counterRange.process(getEncoderValue());
+  uint8_t val = counterRange.process(getEncoderValue());
+  //report.joystickAxes[0] = val;
+  report.joystickAxes[1] = val;
   nunchuk.sendChange(report);
 }
 
