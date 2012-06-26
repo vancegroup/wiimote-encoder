@@ -32,26 +32,45 @@ Nunchuk::CalibData Nunchuk::calibration = {
  	{0, 0, 0},
  	{0, 0, 0x20 }, // arbitrary choice
  	{
- 		{0xff, 0x00, 0x7f},
- 		{0xff, 0x00, 0x7f}
+ 		{0x00, 0xff, 0x01},
+ 		{0x00, 0xff, 0x01}
  	}
  };
  */
 
-/* based on log from http://www.wiire.org/Talk:Wii/protocols/wiimote_bus */
+/* originally based on log from http://www.wiire.org/Talk:Wii/protocols/wiimote_bus
+ starting at the START A5 Control Byte: Slave Address 52 Read line
+ following a write of 20 to slave 52.
+ 
+ Now combined with log from http://blog.21ic.com/user1/3633/archives/2008/50560.html
+ */
+ 
+#undef USE_SKEWED_CALIBRATION
 Nunchuk::CalibData Nunchuk::calibration = {
-  {
-    0x58, 0xf5, 0x32  }
+  {    0x58, 0xf5, 0x32  }
   ,
-  {
-    0xcc, 0xbf, 0x2b  }
+  0x0,
+  0x0,
+  0x0,
+  {    0xcc, 0xbf, 0x2b  }
   ,
+  0x0,
+  0x0,
+  0x0,
   {
-    {
-      0x00, 0xff, 0x7f    }
+#ifdef USE_SKEWED_CALIBRATION
+    {      0x00, 0xff, 0x7f    },
+    {0x00, 0xff, 0x01}
+#else
+
+    {      0x00, 0xff, 0x7f    }
     ,
-    {
-      0x00, 0xff, 0x7f    }
+    {      0x00, 0xff, 0x7f    }
+    /*
+    {0x00, 0xff, 0x01},
+ 		{0x00, 0xff, 0x01}
+ */
+#endif
   }
 };
 

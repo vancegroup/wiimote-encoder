@@ -47,7 +47,13 @@ class Nunchuk {
 
 		struct CalibData {
 			uint8_t accelCalibZero[3];
+			uint8_t accelZLowZero : 2;
+			uint8_t accelYLowZero : 2;
+			uint8_t accelXLowZero : 2;
 			uint8_t accelCalibG[3];
+			uint8_t accelZLowG : 2;
+			uint8_t accelYLowG : 2;
+			uint8_t accelXLowG : 2;
 			struct JSCalibAxis {
 				uint8_t maxVal;
 				uint8_t minVal;
