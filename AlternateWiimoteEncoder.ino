@@ -56,10 +56,6 @@ void doConnect() {
 }
 
 void setup() {
-  // setup code goes here
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-
   doConnect();
 
   //Initialize serial
@@ -79,13 +75,7 @@ void loop() {
   }
 
   sendChange();
-
-  digitalWrite(LED_BUILTIN, LOW);
   delay(25);
-  //Serial << "Counter value: " << _DEC(myCounter) << " Mapped: " << _DEC(mapped) << endl;
-  //Serial.println(mapcounter, DEC);
-  //Serial.println(getEncoderValue(), DEC);
-  //report.joystickAxes[0] = lowByte(counter);
 }
 
 
