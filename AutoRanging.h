@@ -2,22 +2,48 @@
 #include <Arduino.h>
 
 
+template<uint8_t modval>
+class uint_mod {
+public:
+  uint_mod() : val(0) {}
+  uint_mod(uint8_t v) : val(v % modval) {}
+  uint_mod(uint_mod const & other) : val(other.val % modval) {}
+  
+  uint8_t operator=(uint8_t v) {
+    val = v % modval;
+    return val;
+  }
+  operator uint8_t() const {
+    return val; 
+  }
+  /*
+  uint8_t operator++() {
+    uint8_t oldval = val;
+    val = (oldval + 1) % modval;
+    return oldval;
+  }
+  */
+private:
+  uint8_t val; 
+};
 
 template<typename T>
 inline T my_constrain(const T x, const T low, const T high) {
- return x < low ? low : (x > high ? high : x);
+  return x < low ? low : (x > high ? high : x);
 }
 
 
 template<typename T1, typename T2>
 inline T2 my_map(const T1 x, const T1 in_min, const T1 in_max, const T2 out_min, const T2 out_max) {
- return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 template<typename InType, typename OutType>
 class AutoRanging {
 public:
-  AutoRanging(OutType lowValue, OutType highValue) : lowVal(lowValue), highVal(highValue), outRange(highValue - lowValue) {}
+  AutoRanging(OutType lowValue, OutType highValue) : 
+  lowVal(lowValue), highVal(highValue), outRange(highValue - lowValue) {
+  }
   void setCenter(InType center, InType initialSpread = 1) {
     centerVal = center;
     minVal = center - initialSpread;
@@ -40,22 +66,22 @@ public:
     return lastValue;
 
   }
-  
+
   void dumpStatus(Print & s) const {
     s.print("Seen range [");
-   s.print(minVal);
-   s.print(", ");
-   s.print(maxVal);
-   s.println("]");
-   s.print("Clamping to range [");
-   s.print(bottomInput);
-   s.print(", ");
-   s.print(topInput);
-   s.println("]");
-   s.print("Last values: input ");
-   s.print(lastInVal);
-   s.print(" -> output ");
-   s.println(lastValue);
+    s.print(minVal);
+    s.print(", ");
+    s.print(maxVal);
+    s.println("]");
+    s.print("Clamping to range [");
+    s.print(bottomInput);
+    s.print(", ");
+    s.print(topInput);
+    s.println("]");
+    s.print("Last values: input ");
+    s.print(lastInVal);
+    s.print(" -> output ");
+    s.println(lastValue);
   }
 
 private:
@@ -80,3 +106,5 @@ private:
   InType topInput;
   InType bottomInput;
 };
+
+
