@@ -16,9 +16,9 @@ Nunchuk::DataReport report = Nunchuk::defaultReport;
 
 Watchdog shouldGetCalled(5000);
 
-
 inline int16_t getEncoderValue() {
-  return enc.read();
+  // Flipping the sign so pushing forward is a positive value.
+  return - enc.read();
 }
 
 
