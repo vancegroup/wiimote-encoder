@@ -28,19 +28,51 @@ enum {
    MinEncoderValue = -4904
 };
 enum {
-   MinOutputValue = 0x7f,
+   MinOutputValue = 0x01,
    MaxOutputValue = 0xff
 };
 
 AutoRanging<int, uint8_t> counterRange(0x7f, 0xff);
+
+uint8_t fakeData(float minval, float maxval) {
+   return static_cast<uint8_t>(sin(static_cast<float>(millis()) / 1000)* (maxval - minval)/2 + minval);
+}
+
+
 void sendChange() {
   // Auto ranging:
   //uint8_t val = counterRange.process(getEncoderValue());
   
   // Manually ranging:
-  uint8_t val = my_map<int16_t, uint8_t>( my_constrain<int16_t>(getEncoderValue(), MinEncoderValue, MaxEncoderValue), MinEncoderValue, MaxEncoderValue, MinOutputValue, MaxOutputValue );
-  
-  //report.joystickAxes[0] = val;
+  uint8_t val = map( constrain(getEncoderValue(), MinEncoderValue, MaxEncoderValue), MinEncoderValue, MaxEncoderValue, MinOutputValue, MaxOutputValue );
+
+  // Make some fake data 
+   // uint8_t val = fakeData(0x01, 0xff);
+/*
+  static uint_mod<3> outState(0);  // variable is "mod 3" - takes 0, 1, 2, and loops.
+  uint8_t val = 128;
+  switch (outState) {
+     case 0:
+       val = 128;
+       break;
+     case 1:
+       val = 192;
+       break;
+     case 2:
+       val = 255;
+       break;
+  } 
+
+  // this part controls when we cycle fake data.
+  static int count = 0;
+  if (count == 0) {
+    outState = outState + 1;
+  }
+  count = (count + 1) % 200;
+  // end fake data stuff
+  */
+  // enabling both changes magnitude by sqrt(2)
+  report.joystickAxes[0] = val;
   report.joystickAxes[1] = val;
   nunchuk.sendChange(report);
 }
@@ -95,7 +127,7 @@ void loop() {
   sendChange();
 
   digitalWrite(LED_BUILTIN, LOW);
-  delay(10);
+  delay(25);
   //Serial << "Counter value: " << _DEC(myCounter) << " Mapped: " << _DEC(mapped) << endl;
   //Serial.println(mapcounter, DEC);
   //Serial.println(getEncoderValue(), DEC);
