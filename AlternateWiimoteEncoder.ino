@@ -32,7 +32,7 @@ enum {
    MaxOutputValue = 0xff
 };
 
-AutoRanging<int, uint8_t> counterRange(0x7f, 0xff);
+AutoRanging<int, uint8_t> counterRange(MinOutputValue, MaxOutputValue);
 
 void sendChange() {
   // Auto ranging:
