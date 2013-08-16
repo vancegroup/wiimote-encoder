@@ -13,7 +13,7 @@
 
 #define dev_detect_port PORTD
 #define dev_detect_ddr DDRD
-#define dev_detect_pin 5
+#define dev_detect_pin 4
 
 // initialize wiimote interface with id (6 bytes), starting data (6 bytes),
 // and calibration data (6 bytes) (and a callback on requests)
